@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Box, TextField, Button, Typography, Container } from '@mui/material';
+import { Link as MuiLink } from '@mui/material';
 import useAuth from '../../hooks/useAuth';
 
 const Login = () => {
@@ -10,11 +11,11 @@ const Login = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         // Logic to handle login
         console.log('User:', user);
         console.log('Password:', password);
-        login();
+        await login();
         navigate('/dashboard');
     };
 
@@ -69,6 +70,14 @@ const Login = () => {
                     </Button>
                 </Box>
             </Box>
+            <div>
+                <Typography variant="body2">
+                    Vous n&apos;avez pas de compte ?{' '}
+                    <MuiLink component={Link} to="/register">
+                        S&apos;inscrire
+                    </MuiLink>
+                </Typography>
+            </div>
         </Container>
     );
 };

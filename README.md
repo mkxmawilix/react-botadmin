@@ -2,7 +2,7 @@
 
 Ce projet est une application web d'administration de bot Discord.
 
-Le bot discord n'est pas présent dans ce repisotory, c'est un projet privé que j'ai réalisé pour un serveur Discord.
+Le bot discord n'est pas présent dans ce repository, c'est un projet privé que j'ai réalisé pour un serveur Discord.
 
 Il y a donc un backend en NodeJS/Express/Mongodb et un frontend en ReactJS.
 

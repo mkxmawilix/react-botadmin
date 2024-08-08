@@ -26,9 +26,9 @@ const Dashboard = () => {
         setAnchorEl(null);
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         handleClose();
-        logout();
+        await logout();
     };
 
 
