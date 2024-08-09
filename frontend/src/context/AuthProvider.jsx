@@ -10,6 +10,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 /** API **/
 import { createUser } from "../api/users/createUser";
 import { getUser } from "../api/users/getUser";
+import { loginUser } from "../api/users/loginUser";
 
 /** Services **/
 import { getAuthToken, isTokenValid } from '../services/Auth/authToken';
@@ -26,9 +27,8 @@ export const AuthProvider = ({ children }) => {
 
     const navigate = useNavigate();
 
-    const handleError = (error, message) => {
-        console.error(error.message);
-        toast.error(message);
+    const handleError = (error) => {
+        toast.error(error.message);
         throw error;
     };
 
@@ -40,12 +40,49 @@ export const AuthProvider = ({ children }) => {
         toast.error(message);
     };
 
-    const login = async () => {
+    const login = async ({ email, password }) => {
+        try {
+            const response = await loginUser({ email, password });
+            if (response) {
+                const authToken = response.token;
+                if (!authToken) {
+                    handleFailure("Sign in failed");
+                }
+                const { username, id: userId } = response.user;
+                const token = getAuthToken(authToken);
+                const userObj = { userId: userId, token: token };
+                setItem('user', JSON.stringify(userObj));
+                setAuthData({ token, userId, user: username });
+                setIsAuthenticated(true);
+                handleSuccess("Successfully logged in");
+                navigate('/dashboard', { replace: true });
+            } else {
+                handleFailure("Failed to login");
+            }
+        } catch (error) {
+            handleError(error);
+        }
         setIsAuthenticated(true);
     };
 
     const logout = async () => {
-        setIsAuthenticated(false);
+        try {
+            const userObj = JSON.parse(getItem('user'));
+            if (!userObj) {
+                return;
+            }
+            removeItem('user');
+            setAuthData({
+                token: null,
+                userId: null,
+                user: null
+            });
+            handleSuccess("Successfully logged out");
+            setIsAuthenticated(false);
+            navigate('/', { replace: true });
+        } catch (error) {
+            handleError(error);
+        }
     };
 
     const register = async ({ email, password, username }) => {
@@ -57,8 +94,8 @@ export const AuthProvider = ({ children }) => {
                     handleFailure("Token not found");
                 }
                 const { username, id: userId } = response.user;
-                let token = getAuthToken(authToken);
-                let userObj = { userId: userId, token: token };
+                const token = getAuthToken(authToken);
+                const userObj = { userId: userId, token: token };
                 setItem('user', JSON.stringify(userObj));
                 setAuthData({ token, userId, user: username });
                 setIsAuthenticated(true);
@@ -69,7 +106,7 @@ export const AuthProvider = ({ children }) => {
                 handleFailure("Failed to register");
             }
         } catch (error) {
-            handleError(error, "Failed to register");
+            handleError(error);
         }
         setIsAuthenticated(true);
     };

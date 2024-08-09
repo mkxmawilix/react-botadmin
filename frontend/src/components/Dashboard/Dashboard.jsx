@@ -18,8 +18,6 @@ const Dashboard = () => {
 
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
-        console.log('Menu clicked');
-        console.log('event:', event);
     };
 
     const handleClose = () => {
@@ -30,7 +28,6 @@ const Dashboard = () => {
         handleClose();
         await logout();
     };
-
 
     return (
         <Box sx={{ display: 'flex' }}>

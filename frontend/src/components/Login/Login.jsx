@@ -5,17 +5,14 @@ import { Link as MuiLink } from '@mui/material';
 import useAuth from '../../hooks/useAuth';
 
 const Login = () => {
-    const [user, setUser] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleLogin = async () => {
-        // Logic to handle login
-        console.log('User:', user);
-        console.log('Password:', password);
-        await login();
+        await login({ email, password });
         navigate('/dashboard');
     };
 
@@ -38,13 +35,13 @@ const Login = () => {
                         margin="normal"
                         required
                         fullWidth
-                        id="user"
-                        label="User"
-                        name="user"
-                        autoComplete="user"
+                        id="email"
+                        label="Adresse e-mail"
+                        name="email"
+                        autoComplete="email"
                         autoFocus
-                        value={user}
-                        onChange={(e) => setUser(e.target.value)}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
                     <TextField
                         variant="outlined"

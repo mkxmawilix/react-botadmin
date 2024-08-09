@@ -17,11 +17,7 @@ const Register = () => {
             alert("Les mots de passe ne correspondent pas !");
             return;
         }
-
-        console.log('Username:', username);
-        console.log('Email:', email);
-        console.log('Password:', password);
-        register(username, email, password);
+        register({username, email, password});
         navigate('/dashboard');
     };
 
