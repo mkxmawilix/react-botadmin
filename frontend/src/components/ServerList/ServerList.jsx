@@ -1,46 +1,55 @@
-import { useState } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box } from '@mui/material';
-import AddServerModal from '../AddServerModal';
-
-const servers = [
-    { id: 1, name: 'Server 1', dateAdded: '2024-07-01' },
-    { id: 2, name: 'Server 2', dateAdded: '2024-07-02' },
-];
+import { useState, useEffect } from 'react';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box } from '@mui/material';
+import { getGuilds } from '../../api/discord/getGuilds';
+import OnlineIcon from '@mui/icons-material/CheckCircleOutline';
+import OfflineIcon from '@mui/icons-material/HighlightOff';
 
 const ServerList = () => {
-    const [open, setOpen] = useState(false);
+    const [guilds, setGuilds] = useState([]);
 
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    useEffect(() => {
+        const fetchGuilds = async () => {
+            try {
+                const response = await getGuilds();
+                setGuilds(response.guilds);
+            } catch (error) {
+                console.error('Error fetching guilds:', error);
+            }
+        };
+
+        fetchGuilds();
+    }, []);
 
     return (
         <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-            <Button variant="contained" color="primary" onClick={handleOpen}>
-                Add Server
-            </Button>
-            </Box>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell>ID</TableCell>
                             <TableCell>Name</TableCell>
-                            <TableCell>Date Added</TableCell>
+                            <TableCell>Created At</TableCell>
+                            <TableCell>Owner</TableCell>
+                            <TableCell>Shard ID</TableCell>
+                            <TableCell>Status</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {servers.map((server) => (
-                            <TableRow key={server.id}>
-                                <TableCell>{server.id}</TableCell>
-                                <TableCell>{server.name}</TableCell>
-                                <TableCell>{server.dateAdded}</TableCell>
+                        {guilds.map((guild) => (
+                            <TableRow key={guild.id}>
+                                <TableCell>{guild.id}</TableCell>
+                                <TableCell>{guild.name}</TableCell>
+                                <TableCell>{new Date(guild.creationDate).toLocaleString()}</TableCell>
+                                <TableCell>{guild.owner}</TableCell>
+                                <TableCell>{guild.shardId}</TableCell>
+                                <TableCell>
+                                    {guild.isActive ? <OnlineIcon color="success" /> : <OfflineIcon color="error" />}
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
-            <AddServerModal open={open} handleClose={handleClose} />
         </Box>
     );
 };

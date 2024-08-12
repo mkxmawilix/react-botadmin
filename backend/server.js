@@ -5,6 +5,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 const UserRoute = require("./routes/users/UserRoute");
+const DiscordRoute = require("./routes/discord/DiscordRoute");
 
 const app = express();
 
@@ -25,6 +26,9 @@ mongoose
     .then(() => console.log("MongoDB Connected"))
     .catch((err) => console.log(err));
 
-// Enable CORS
+// CORS
 app.use(cors());
+
+// Routes
 app.use("/", UserRoute);
+app.use("/", DiscordRoute);
