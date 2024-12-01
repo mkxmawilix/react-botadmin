@@ -1,8 +1,8 @@
 import apiClient from '../../services/Api/apiClient';
 
-export const getGuilds = async (mode) => {
+export const getGuild = async (guildId) => {
     try {
-        const response = await apiClient.get('/discord/guilds/', { params: { mode } });
+        const response = await apiClient.get(`/discord/guild/${guildId}`);
         return response.data;
     } catch (error) {
         if (error.response) {

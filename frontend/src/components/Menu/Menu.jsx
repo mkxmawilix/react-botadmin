@@ -6,12 +6,13 @@ const Menu = () => {
 
     const menuItems = [
         { text: 'Server List', path: '/dashboard/servers' },
+        { text: 'Configuration', path: '/dashboard/configuration' },
     ];
 
     return (
         <List component="nav">
             {menuItems.map((item, index) => (
-                <ListItem button key={index} onClick={() => navigate(item.path)}>
+                <ListItem key={index} onClick={() => navigate(item.path)}>
                     <ListItemText primary={item.text} />
                 </ListItem>
             ))}

@@ -6,8 +6,11 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import { Menu as MenuApp } from '../Menu/Menu';
-import ServerList from '../ServerList';
+
 import useAuth from '../../hooks/useAuth';
+
+import ServerList from '../ServerList';
+import ServerConfig from '../ServerConfig';
 
 const drawerWidth = 240;
 
@@ -92,6 +95,8 @@ const Dashboard = () => {
                 <Toolbar />
                 <Routes>
                     <Route path="servers" element={<ServerList />} />
+                    <Route path="configuration" element={<ServerList mode="config" />} />
+                    <Route path="configuration/:serverId" element={<ServerConfig />} />
                 </Routes>
             </Box>
         </Box>

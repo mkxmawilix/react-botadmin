@@ -13,7 +13,7 @@ app.listen(process.env.PORT || 5000, () => {
     console.log("Listening on PORT " + process.env.PORT || 5000);
 });
 
-app.use(morgan("tiny"));
+app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
