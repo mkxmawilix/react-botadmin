@@ -14,12 +14,12 @@ const ServerConfig = () => {
         const fetchGuild = async () => {
             try {
                 const response = await getGuild(serverId);
+                console.log('Guild:', response);
                 setGuild(response);
             } catch (error) {
                 console.error('Error fetching guild:', error);
             }
         };
-
         fetchGuild();
     }, [serverId]);
 

@@ -2,6 +2,7 @@ require("dotenv").config({ path: "../.env" });
 const axios = require('axios');
 const Guild = require('../models/Guild');
 const Permission = require('../models/Permission');
+const Cog = require('../models/Cog');
 
 exports.getGuilds = async (req, res) => {
     try {
@@ -58,13 +59,27 @@ exports.getGuild = async (req, res) => {
             return res.status(404).json({ message: "Guild not found." });
         }
 
+        const cogs = await Cog.find();
+        for (const cog of cogs) {
+            const collectionName = cog.collection_name;
+            const collection = await Cog.db.collection(collectionName).findOne({ guild_id: guildIdNumber });
+            cog.settings = collection;
+        }
+
+        const cogsSettings = cogs.map(cog => {
+            return {
+                name: cog.name,
+                settings: cog.settings
+            };
+        });
         const guildData = {
             id: guild.id,
             name: guild.name,
             creationDate: guild.creationDate,
             shardId: guild.shardId,
             owner: guild.owner,
-            isActive: guild.isActive
+            isActive: guild.isActive,
+            cogsSettings: cogsSettings
         };
         return res.status(200).json(guildData);
     } catch (error) {
