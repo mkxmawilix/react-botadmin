@@ -1,24 +1,62 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Typography, Container } from '@mui/material';
-import useAuth from '../../hooks/useAuth';
+import toast from 'react-hot-toast';
+
+/** Context */
+import { useSession } from '../../context/SessionContext';
+
+/** Hooks **/
+import { useCreateUser } from "../../hooks/useCreateUser";
+
+/** Services **/
+import { getAuthToken } from "../../services/Auth/authToken";
+
 
 const Register = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    
-    const { register } = useAuth();
     const navigate = useNavigate();
+    const createUser = useCreateUser();
 
-    const handleRegister = () => {
+    const { setSession } = useSession();
+
+    const handleRegister = async () => {
         if (password !== confirmPassword) {
-            alert("Les mots de passe ne correspondent pas !");
+            toast.error("Passwords don't match");
             return;
         }
-        register({username, email, password});
-        navigate('/dashboard');
+        try {
+            const response = await createUser({ email, password, username });
+            if (response) {
+                const authToken = response.token;
+                if (!authToken) {
+                    toast.error("Token not found");
+                }
+                const { username, id: userId } = response.user;
+                const token = getAuthToken(authToken);
+                if (token) {
+                    const session = {
+                        user: {
+                            id: userId,
+                            name: username,
+                            email: email,
+                            token: token,
+                        },
+                    };
+                    setSession(session);
+                    navigate('/', { replace: true })
+                }
+            } else {
+                toast.error("Failed to register");
+            }
+        } catch (error) {
+            toast.error(error.message);
+            throw error;
+        }
+        navigate('/');
     };
 
     return (

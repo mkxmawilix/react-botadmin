@@ -30,10 +30,6 @@ exports.getGuilds = async (req, res) => {
                 };
             });
 
-            if (req.query.mode === 'config') {
-                return res.status(200).json({ guilds: guildsWithStatus.filter(g => g.canConfigure) });
-            }
-
             return res.status(200).json({ guilds: guildsWithStatus });
         } else {
             return res.status(flaskResponse.status).json({ message: "Failed to fetch guilds from the bot." });
@@ -46,7 +42,6 @@ exports.getGuilds = async (req, res) => {
 
 exports.getGuild = async (req, res) => {
     const { guildId } = req.params;
-
     try {
         const guildIdNumber = Number(guildId);
         if (isNaN(guildIdNumber)) {
@@ -81,6 +76,7 @@ exports.getGuild = async (req, res) => {
             isActive: guild.isActive,
             cogsSettings: cogsSettings
         };
+
         return res.status(200).json(guildData);
     } catch (error) {
         console.error('Error fetching guild from MongoDB:', error);

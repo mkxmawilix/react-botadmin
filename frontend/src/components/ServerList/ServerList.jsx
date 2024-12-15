@@ -5,28 +5,41 @@ import OfflineIcon from '@mui/icons-material/HighlightOff';
 
 import { useNavigate } from 'react-router-dom';
 
-import { getGuilds } from '../../api/discord/getGuilds';
+import { useGetGuilds } from '../../hooks/useGetGuilds';
 
-const ServerList = ({ mode='list' }) => {
+const ServerList = () => {
     const [guilds, setGuilds] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const getGuilds = useGetGuilds();
 
     useEffect(() => {
         const fetchGuilds = async () => {
             try {
-                const response = await getGuilds(mode);
-                setGuilds(response.guilds);
-            } catch (error) {
-                console.error('Error fetching guilds:', error);
+                const data = await getGuilds();
+                setGuilds(data.guilds);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchGuilds();
-    }, [mode]);
+    }, [getGuilds]);
+
 
     const handleView = (id) => {
-        navigate(`/dashboard/configuration/${id}`);
+        navigate(`/servers/${id}`);
     };
+
+    if (loading) {
+        return <p>Loading...</p>;
+    }
+    if (error) {
+        return <p>Error: {error}</p>;
+    }
 
     return (
         <Box>
@@ -36,19 +49,11 @@ const ServerList = ({ mode='list' }) => {
                         <TableRow>
                             <TableCell>ID</TableCell>
                             <TableCell>Name</TableCell>
-                            { mode === 'list' ? 
-                                <>
-                                    <TableCell>Created At</TableCell>
-                                    <TableCell>Owner</TableCell>
-                                    <TableCell>Shard ID</TableCell>
-                                    <TableCell>Status</TableCell>
-                                </>
-                                : 
-                                <>
-                                    <TableCell></TableCell>
-                                </>
-                            }
-                            
+                            <TableCell>Created At</TableCell>
+                            <TableCell>Owner</TableCell>
+                            <TableCell>Shard ID</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -56,18 +61,14 @@ const ServerList = ({ mode='list' }) => {
                             <TableRow key={guild.id}>
                                 <TableCell>{guild.id}</TableCell>
                                 <TableCell>{guild.name}</TableCell>
-                                { mode === 'list' ?
-                                <>
-                                    <TableCell>{new Date(guild.creationDate).toLocaleString()}</TableCell>
-                                    <TableCell>{guild.owner}</TableCell>
-                                    <TableCell>{guild.shardId}</TableCell>
-                                    <TableCell>
-                                        {guild.isActive ? <OnlineIcon color="success" /> : <OfflineIcon color="error" />}
-                                    </TableCell>
-                                </>
-                                : 
-                                <>
-                                    <TableCell>
+                                <TableCell>{new Date(guild.creationDate).toLocaleString()}</TableCell>
+                                <TableCell>{guild.owner}</TableCell>
+                                <TableCell>{guild.shardId}</TableCell>
+                                <TableCell>
+                                    {guild.isActive ? <OnlineIcon color="success" /> : <OfflineIcon color="error" />}
+                                </TableCell>
+                                <TableCell>
+                                    {guild.canConfigure && (
                                         <Button
                                             variant="contained"
                                             color="primary"
@@ -75,14 +76,15 @@ const ServerList = ({ mode='list' }) => {
                                         >
                                             View
                                         </Button>
-                                    </TableCell>
-                                </>
-                                }
+                                    )}
+                                </TableCell>
                             </TableRow>
                         ))}
                         {guilds.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={5} align="center">No servers found.</TableCell>
+                                <TableCell colSpan={7} align="center">
+                                    No servers found.
+                                </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
