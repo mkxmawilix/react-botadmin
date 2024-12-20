@@ -15,6 +15,9 @@ import SignIn from './pages/signIn';
 /** Components */
 import Register from './components/Register';
 
+import { SessionProvider } from "./context/SessionProvider";
+
+
 
 const router = createBrowserRouter([
     {
@@ -56,6 +59,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <SessionProvider>
+            <RouterProvider router={router} />
+        </SessionProvider>
     </React.StrictMode>,
 );

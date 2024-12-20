@@ -1,4 +1,6 @@
-export const loginUser = async (apiClient, { email, password }) => {
+import apiClient from '../../services/Api/apiClient';
+
+export const loginUser = async ({ email, password }) => {
     try {
         const response = await apiClient.post('/login', {
             email,

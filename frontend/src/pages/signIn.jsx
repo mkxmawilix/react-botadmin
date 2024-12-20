@@ -1,14 +1,15 @@
 import { SignInPage } from '@toolpad/core/SignInPage';
 import Link from '@mui/material/Link';
 import { useNavigate } from 'react-router-dom';
-import { useSession } from '../context/SessionContext';
 
 /** Hooks **/
-import { useLoginUser } from '../hooks/useLoginUser.jsx';
+import { useSession } from '../hooks/useSession';
 
 /** Services **/
 import { getAuthToken } from '../services/Auth/authToken';
 
+/** API **/
+import { loginUser } from "../api/users/loginUser"
 
 const SignUpLink = () => {
     return (
@@ -22,7 +23,6 @@ const SignUpLink = () => {
 const SignIn = () => {
     const { setSession } = useSession();
     const navigate = useNavigate();
-    const loginUser = useLoginUser();
     const providers = [{ id: 'credentials', name: 'Email and Password' }];
 
     const handleSignIn = async (email, password) => {

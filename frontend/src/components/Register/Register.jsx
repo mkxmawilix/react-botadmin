@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Typography, Container } from '@mui/material';
 import toast from 'react-hot-toast';
 
-/** Context */
-import { useSession } from '../../context/SessionContext';
-
 /** Hooks **/
-import { useCreateUser } from "../../hooks/useCreateUser";
+import { useSession } from '../../hooks/useSession';
 
 /** Services **/
 import { getAuthToken } from "../../services/Auth/authToken";
+
+/** API **/
+import { createUser } from "../../api/users/createUser";
 
 
 const Register = () => {
@@ -19,7 +19,6 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const navigate = useNavigate();
-    const createUser = useCreateUser();
 
     const { setSession } = useSession();
 

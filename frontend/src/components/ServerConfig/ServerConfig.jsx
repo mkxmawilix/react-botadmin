@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, TextField, Button } from '@mui/material';
 
-import { useGetGuild } from '../../hooks/useGetGuild';
+/** API **/
+import { getGuild } from '../../api/discord/getGuild';
+
 
 
 const ServerConfig = () => {
     const { serverId } = useParams();
     const navigate = useNavigate();
-    const getGuild = useGetGuild()
     const [guild, setGuild] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -25,7 +26,7 @@ const ServerConfig = () => {
             }
         };
         fetchGuild();
-    }, [serverId, getGuild]);
+    }, [serverId]);
 
     const handleSave = () => {
         console.log('Saving configuration for:', serverId);

@@ -5,14 +5,14 @@ import OfflineIcon from '@mui/icons-material/HighlightOff';
 
 import { useNavigate } from 'react-router-dom';
 
-import { useGetGuilds } from '../../hooks/useGetGuilds';
+/** API **/
+import { getGuilds } from '../../api/discord/getGuilds';
 
 const ServerList = () => {
     const [guilds, setGuilds] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const getGuilds = useGetGuilds();
 
     useEffect(() => {
         const fetchGuilds = async () => {
@@ -27,7 +27,7 @@ const ServerList = () => {
         };
 
         fetchGuilds();
-    }, [getGuilds]);
+    }, []);
 
 
     const handleView = (id) => {

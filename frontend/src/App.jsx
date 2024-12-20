@@ -7,7 +7,7 @@ import StorageIcon from '@mui/icons-material/Storage';
 // import TuneIcon from '@mui/icons-material/Tune';
 import { AppProvider } from '@toolpad/core/react-router-dom';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { SessionContext } from './context/SessionContext';
+import { useSession } from "./hooks/useSession";
 
 
 const NAVIGATION = [
@@ -34,7 +34,7 @@ const NAVIGATION = [
 
 const App = () => {
 
-    const [session, setSession] = React.useState(null);
+    const {session, setSession} = useSession();
     const navigate = useNavigate();
 
     const signIn = React.useCallback(() => {
@@ -44,11 +44,10 @@ const App = () => {
     const signOut = React.useCallback(() => {
         setSession(null);
         navigate('/sign-in');
-    }, [navigate]);
+    }, [navigate, setSession]);
 
-    const sessionContextValue = React.useMemo(() => ({ session, setSession }), [session, setSession]);
     return (
-        <SessionContext.Provider value={sessionContextValue}>
+        <>
             <Toaster />
             <AppProvider
                 navigation={NAVIGATION}
@@ -57,7 +56,7 @@ const App = () => {
             >
                 <Outlet />
             </AppProvider>
-        </SessionContext.Provider>
+        </>
     );
 }
 
