@@ -1,12 +1,12 @@
-import Typography from '@mui/material/Typography';
-
+import { PageContainer } from '@toolpad/core/PageContainer';
 import { ServerList } from '../components/ServerList/ServerList';
 
 const ServerListPage = () => {
-    return <>
-        <Typography>Welcome to Server List page!</Typography>
 
-        <ServerList/>
-    </>
+    return (
+        <PageContainer >
+            <ServerList />
+        </PageContainer>
+    )
 }
 export default ServerListPage;

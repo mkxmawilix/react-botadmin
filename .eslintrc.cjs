@@ -10,13 +10,14 @@ module.exports = {
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
   settings: { react: { version: '18.2' } },
-  plugins: ['react-refresh'],
+  plugins: ['react-refresh', '@stylistic/js', '@stylistic/jsx'],
   rules: {
     'react-refresh/only-export-components': [
       'warn',
       { allowConstantExport: true },
     ],
-    'indent': ['error', 4],
+    '@stylistic/js/indent': ['error', 4],
+    '@stylistic/js/jsx-quotes': ["error", "prefer-double"],
     'no-restricted-imports': [
       'error',
       {

@@ -1,6 +1,5 @@
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
 import { isTokenValid } from "../services/Auth/authToken";
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -33,9 +32,7 @@ const AppDashboardLayout = () => {
         <DashboardLayout slots={{
             appTitle: CustomAppTitle,
         }}>
-            <PageContainer>
-                <Outlet />
-            </PageContainer>
+            <Outlet />
         </DashboardLayout>
     );
 }
