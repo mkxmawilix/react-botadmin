@@ -1,11 +1,11 @@
 import apiClient from '../../services/Api/apiClient';
 
-export const getGuild = async (guildId) => {
+export const getGuilds = async () => {
     try {
-        const response = await apiClient.get(`/discord/guilds/${guildId}`);
+        const response = await apiClient.get("/guilds");
         return response.data;
     } catch (error) {
         console.error('Error fetching guild:', error);
-        throw new Error('Failed to fetch guild.');
+        throw error;
     }
 };

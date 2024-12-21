@@ -6,7 +6,7 @@ import OfflineIcon from '@mui/icons-material/HighlightOff';
 import { useNavigate } from 'react-router-dom';
 
 /** API **/
-import { getGuilds } from '../../api/discord/getGuilds';
+import { getGuilds } from '../../api/guilds/getGuilds';
 
 const ServerList = () => {
     const [guilds, setGuilds] = useState([]);

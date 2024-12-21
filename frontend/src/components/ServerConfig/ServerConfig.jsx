@@ -1,65 +1,122 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Typography, TextField, Button } from '@mui/material';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
+import { Box, Tabs, Tab, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 
-/** API **/
-import { getGuild } from '../../api/discord/getGuild';
+/** Components **/
+import DynamicConfigForm from "../DynamicConfigForm"
 
+const ServerConfig = ({ guild }) => {
+    const [activeTab, setActiveTab] = useState(0);
+    const [isDirty, setIsDirty] = useState(() =>
+        guild.cogsSettings.map(() => false)
+    );
+    const [showDialog, setShowDialog] = useState(false);
+    const [pendingTab, setPendingTab] = useState(null);
 
-
-const ServerConfig = () => {
-    const { serverId } = useParams();
-    const navigate = useNavigate();
-    const [guild, setGuild] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const fetchGuild = async () => {
-            try {
-                const response = await getGuild(serverId);
-                setGuild(response);
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching guild:', error);
-                setError(error);
-            }
-        };
-        fetchGuild();
-    }, [serverId]);
-
-    const handleSave = () => {
-        console.log('Saving configuration for:', serverId);
+    const handleTabChange = (event, newValue) => {
+        if (isDirty[activeTab]) {
+            setShowDialog(true);
+            setPendingTab(newValue);
+        } else {
+            setActiveTab(newValue);
+        }
     };
 
-    if (loading) {
-        return <p>Loading...</p>;
-    }
-    if (error) {
-        return <p>Error: {error}</p>;
-    }
+    const confirmTabChange = () => {
+        setShowDialog(false);
+        setActiveTab(pendingTab);
+        setPendingTab(null);
+    };
+
+    const cancelTabChange = () => {
+        setShowDialog(false);
+        setPendingTab(null);
+    };
+
+    const handleDirtyChange = (index, dirty) => {
+
+        // Form has changed set current tab as dirty
+        setIsDirty((prev) => {
+            const newState = [...prev];
+            newState[index] = dirty;
+            return newState;
+        });
+    };
+
+    const handleSave = (index, data) => {
+        // TODO: Apply config changes here
+        // Remove dirty state
+        setIsDirty((prev) => {
+            const newState = [...prev];
+            newState[index] = false;
+            return newState;
+        });
+    };
 
     return (
-        <Box>
-            <Typography variant="h5" gutterBottom>
-                Configuration for {guild.name}
-            </Typography>
-            <Box sx={{ mb: 2 }}>
-                <TextField
-                    label="Guild Name"
-                    value={guild.name}
-                    fullWidth
-                    disabled
-                />
-            </Box>
-            <Button variant="contained" color="primary" onClick={handleSave}>
-                Save
-            </Button>
-            <Button variant="text" sx={{ ml: 2 }} onClick={() => navigate('/dashboard')}>
-                Back to Dashboard
-            </Button>
+        <Box sx={{ display: 'flex', flexGrow: 1, bgcolor: 'background.paper', height: '100%' }}>
+            <Tabs
+                orientation="vertical"
+                variant="scrollable"
+                value={activeTab}
+                onChange={handleTabChange}
+                aria-label="Cogs configurations tabs"
+                sx={{ borderRight: 1, borderColor: 'divider' }}
+            >
+                {guild.cogsSettings.map((settings, index) => (
+                    <Tab key={index} label={settings.name || `Cog ${index + 1}`} />
+                ))}
+            </Tabs>
+            {/* TODO map on transformed object usable by the form */}
+            {guild.cogsSettings.map((settings, index) => (
+                <Box
+                    key={index}
+                    role="tabpanel"
+                    hidden={activeTab !== index}
+                    id={`vertical-tabpanel-${index}`}
+                    aria-labelledby={`vertical-tab-${index}`}
+                    sx={{ p: 3 }}
+                >
+                    {activeTab === index && (
+                        /* TODO Use new transformed object to send fields to the form */
+                        <DynamicConfigForm
+                            fields={[{
+                                name: 'activeCog',
+                                label: 'Active',
+                                type: 'checkbox',
+                                defaultValue: false,
+                                validation: {
+                                    required: true,
+                                },
+                            }]}
+                            onSave={(data) => handleSave(index, data)}
+                            onDirtyChange={(dirty) => handleDirtyChange(index, dirty)}
+                        />
+                    )}
+                </Box>
+            ))}
+            <Dialog open={showDialog} onClose={cancelTabChange}>
+                <DialogTitle>Unsaved Changes</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        You have unsaved changes in the current tab. Are you sure you want to switch tabs without saving?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={cancelTabChange} color="secondary">
+                        Cancel
+                    </Button>
+                    <Button onClick={confirmTabChange} color="primary">
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
+};
+
+ServerConfig.propTypes = {
+    guild: PropTypes.object.isRequired,
 };
 
 export { ServerConfig };

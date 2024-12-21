@@ -5,8 +5,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 const UserRoute = require("./routes/users/UserRoute");
-const DiscordRoute = require("./routes/discord/DiscordRoute");
-const CogRoute = require("./routes/cogs/CogRoute");
+const GuildRoute = require("./routes/guilds/GuildRoute");
 
 const app = express();
 
@@ -48,5 +47,4 @@ app.use((req, res, next) => {
 
 // Routes
 app.use("/", UserRoute);
-app.use("/", DiscordRoute);
-app.use("/", CogRoute);
+app.use("/", GuildRoute);

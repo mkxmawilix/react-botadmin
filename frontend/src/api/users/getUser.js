@@ -6,6 +6,6 @@ export const getUser = async (userId) => {
         return response.data;
     } catch (error) {
         console.error('Error creating user:', error);
-        throw new Error('Failed to create user.');
+        throw error;
     }
 };

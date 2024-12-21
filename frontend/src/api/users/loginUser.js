@@ -9,6 +9,6 @@ export const loginUser = async ({ email, password }) => {
         return response.data;
     } catch (error) {
         console.error('Error during logging :', error);
-        throw new Error('Failed to log user.');
+        throw error;
     }
 };
