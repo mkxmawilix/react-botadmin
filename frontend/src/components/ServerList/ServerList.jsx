@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box, Button } from '@mui/material';
-import OnlineIcon from '@mui/icons-material/CheckCircleOutline';
-import OfflineIcon from '@mui/icons-material/HighlightOff';
+import { useState, useEffect } from "react";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box, Button } from "@mui/material";
+import OnlineIcon from "@mui/icons-material/CheckCircleOutline";
+import OfflineIcon from "@mui/icons-material/HighlightOff";
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 /** API **/
-import { getGuilds } from '../../api/guilds/getGuilds';
+import { getGuilds } from "../../api/guilds/getGuilds";
 
 const ServerList = () => {
     const [guilds, setGuilds] = useState([]);
@@ -28,7 +28,6 @@ const ServerList = () => {
 
         fetchGuilds();
     }, []);
-
 
     const handleView = (id) => {
         navigate(`/servers/${id}`);

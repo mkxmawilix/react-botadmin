@@ -1,15 +1,23 @@
-import { useState } from 'react';
-import PropTypes from 'prop-types';
-import { Box, Tabs, Tab, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
+import { useState } from "react";
+import PropTypes from "prop-types";
+import {
+    Box,
+    Tabs,
+    Tab,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+    Button,
+} from "@mui/material";
 
 /** Components **/
-import DynamicConfigForm from "../DynamicConfigForm"
+import DynamicConfigForm from "../DynamicConfigForm";
 
 const ServerConfig = ({ guild }) => {
     const [activeTab, setActiveTab] = useState(0);
-    const [isDirty, setIsDirty] = useState(() =>
-        guild.cogsSettings.map(() => false)
-    );
+    const [isDirty, setIsDirty] = useState(() => guild.cogsSettings.map(() => false));
     const [showDialog, setShowDialog] = useState(false);
     const [pendingTab, setPendingTab] = useState(null);
 
@@ -34,7 +42,6 @@ const ServerConfig = ({ guild }) => {
     };
 
     const handleDirtyChange = (index, dirty) => {
-
         // Form has changed set current tab as dirty
         setIsDirty((prev) => {
             const newState = [...prev];
@@ -54,14 +61,14 @@ const ServerConfig = ({ guild }) => {
     };
 
     return (
-        <Box sx={{ display: 'flex', flexGrow: 1, bgcolor: 'background.paper', height: '100%' }}>
+        <Box sx={{ display: "flex", flexGrow: 1, bgcolor: "background.paper", height: "100%" }}>
             <Tabs
                 orientation="vertical"
                 variant="scrollable"
                 value={activeTab}
                 onChange={handleTabChange}
                 aria-label="Cogs configurations tabs"
-                sx={{ borderRight: 1, borderColor: 'divider' }}
+                sx={{ borderRight: 1, borderColor: "divider" }}
             >
                 {guild.cogsSettings.map((settings, index) => (
                     <Tab key={index} label={settings.name || `Cog ${index + 1}`} />
@@ -80,15 +87,26 @@ const ServerConfig = ({ guild }) => {
                     {activeTab === index && (
                         /* TODO Use new transformed object to send fields to the form */
                         <DynamicConfigForm
-                            fields={[{
-                                name: 'activeCog',
-                                label: 'Active',
-                                type: 'checkbox',
-                                defaultValue: false,
-                                validation: {
-                                    required: true,
+                            fields={[
+                                {
+                                    name: "activeCog",
+                                    label: "Active",
+                                    type: "checkbox",
+                                    defaultValue: false,
+                                    validation: {
+                                        required: true,
+                                    },
                                 },
-                            }]}
+                                {
+                                    name: "blockedChannelIds",
+                                    label: "Blocked Channel IDs",
+                                    type: "array",
+                                    defaultValue: ["123", "456"],
+                                    validation: {
+                                        required: true,
+                                    },
+                                },
+                            ]}
                             onSave={(data) => handleSave(index, data)}
                             onDirtyChange={(dirty) => handleDirtyChange(index, dirty)}
                         />
@@ -99,7 +117,8 @@ const ServerConfig = ({ guild }) => {
                 <DialogTitle>Unsaved Changes</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        You have unsaved changes in the current tab. Are you sure you want to switch tabs without saving?
+                        You have unsaved changes in the current tab. Are you sure you want to switch tabs without
+                        saving?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

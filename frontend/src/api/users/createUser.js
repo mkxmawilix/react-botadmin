@@ -1,12 +1,12 @@
-import apiClient from '../../services/Api/apiClient';
+import apiClient from "../../services/Api/apiClient";
 
-export const createUser = async ({ email, password, username}) => {
+export const createUser = async ({ email, password, username }) => {
     try {
-        const data = { email, password, username};
-        const response = await apiClient.get('/register', data);
+        const data = { email, password, username };
+        const response = await apiClient.get("/register", data);
         return response.data;
     } catch (error) {
-        console.error('Error creating user:', error);
+        console.error("Error creating user:", error);
         throw error;
     }
 };

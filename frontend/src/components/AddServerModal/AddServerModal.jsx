@@ -1,24 +1,24 @@
-import { useState } from 'react';
-import { Modal, Box, TextField, Button, Typography } from '@mui/material';
-import PropTypes from 'prop-types';
+import { useState } from "react";
+import { Modal, Box, TextField, Button, Typography } from "@mui/material";
+import PropTypes from "prop-types";
 
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: "background.paper",
+    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
 };
 
 const AddServerModal = ({ open, handleClose }) => {
-    const [serverName, setServerName] = useState('');
+    const [serverName, setServerName] = useState("");
 
     const handleSubmit = () => {
-        console.log('Server Name:', serverName);
+        console.log("Server Name:", serverName);
         handleClose();
     };
 

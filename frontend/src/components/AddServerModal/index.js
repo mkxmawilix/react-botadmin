@@ -1,3 +1,3 @@
-import { AddServerModal } from './AddServerModal';
+import { AddServerModal } from "./AddServerModal";
 
 export default AddServerModal;

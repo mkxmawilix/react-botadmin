@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Box, TextField, Button, Typography, Container } from '@mui/material';
-import toast from 'react-hot-toast';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Box, TextField, Button, Typography, Container } from "@mui/material";
+import toast from "react-hot-toast";
 
 /** Hooks **/
-import { useSession } from '../../hooks/useSession';
+import { useSession } from "../../hooks/useSession";
 
 /** Services **/
 import { getAuthToken } from "../../services/Auth/authToken";
@@ -12,12 +12,11 @@ import { getAuthToken } from "../../services/Auth/authToken";
 /** API **/
 import { createUser } from "../../api/users/createUser";
 
-
 const Register = () => {
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const navigate = useNavigate();
 
     const { setSession } = useSession();
@@ -46,7 +45,7 @@ const Register = () => {
                         },
                     };
                     setSession(session);
-                    navigate('/', { replace: true })
+                    navigate("/", { replace: true });
                 }
             } else {
                 toast.error("Failed to register");
@@ -55,7 +54,7 @@ const Register = () => {
             toast.error(error.message);
             throw error;
         }
-        navigate('/');
+        navigate("/");
     };
 
     return (
@@ -63,9 +62,9 @@ const Register = () => {
             <Box
                 sx={{
                     marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
                 }}
             >
                 <Typography component="h1" variant="h5">
@@ -123,13 +122,7 @@ const Register = () => {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                     />
-                    <Button
-                        type="button"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
-                        onClick={handleRegister}
-                    >
+                    <Button type="button" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} onClick={handleRegister}>
                         S&apos;inscrire
                     </Button>
                 </Box>

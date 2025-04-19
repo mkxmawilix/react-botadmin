@@ -1,11 +1,11 @@
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 
 export const getAuthToken = (authHeader) => {
     if (!authHeader) {
         return null;
     }
-    return authHeader.split(' ')[1];
-}
+    return authHeader.split(" ")[1];
+};
 
 export const isTokenValid = (token, userId) => {
     try {
@@ -18,4 +18,4 @@ export const isTokenValid = (token, userId) => {
     } catch (error) {
         return false;
     }
-}
+};

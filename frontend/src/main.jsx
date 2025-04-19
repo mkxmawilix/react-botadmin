@@ -1,66 +1,64 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import App from './App';
+import * as React from "react";
+import * as ReactDOM from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import App from "./App";
 
 /** Layouts */
-import AppDashboardLayout from './layouts/Dashboard';
+import AppDashboardLayout from "./layouts/Dashboard";
 
 /** Pages */
-import DashboardPage from './pages/index';
-import ServerListPage from './pages/serverList';
-import ServerConfigurationPage from './pages/configuration';
-import SignIn from './pages/signIn';
+import DashboardPage from "./pages/index";
+import ServerListPage from "./pages/serverList";
+import ServerConfigurationPage from "./pages/configuration";
+import SignIn from "./pages/signIn";
 
 /** Components */
-import Register from './components/Register';
+import Register from "./components/Register";
 
 import { SessionProvider } from "./context/SessionProvider";
-
-
 
 const router = createBrowserRouter([
     {
         Component: App,
         children: [
             {
-                path: '/',
+                path: "/",
                 Component: AppDashboardLayout,
                 children: [
                     {
-                        path: '',
+                        path: "",
                         Component: DashboardPage,
                     },
                     {
-                        path: '/serverlist',
+                        path: "/serverlist",
                         Component: ServerListPage,
                     },
                     {
-                        path: '/servers/:serverId',
+                        path: "/servers/:serverId",
                         Component: ServerConfigurationPage,
                     },
                     {
-                        path: '/configuration/:serverId',
+                        path: "/configuration/:serverId",
                         Component: ServerConfigurationPage,
                     },
                 ],
             },
             {
-                path: '/sign-in',
+                path: "/sign-in",
                 Component: SignIn,
             },
             {
-                path: '/register',
+                path: "/register",
                 Component: Register,
-            }
+            },
         ],
     },
 ]);
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
         <SessionProvider>
             <RouterProvider router={router} />
         </SessionProvider>
-    </React.StrictMode>,
+    </React.StrictMode>
 );

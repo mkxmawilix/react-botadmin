@@ -1,12 +1,11 @@
-import { PageContainer } from '@toolpad/core/PageContainer';
-import { ServerList } from '../components/ServerList/ServerList';
+import { PageContainer } from "@toolpad/core/PageContainer";
+import { ServerList } from "../components/ServerList/ServerList";
 
 const ServerListPage = () => {
-
     return (
-        <PageContainer >
+        <PageContainer>
             <ServerList />
         </PageContainer>
-    )
-}
+    );
+};
 export default ServerListPage;

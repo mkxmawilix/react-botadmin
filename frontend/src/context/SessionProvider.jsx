@@ -1,36 +1,32 @@
-import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { SessionContext } from "./SessionContext"
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { SessionContext } from "./SessionContext";
 
 /** Services **/
-import { isTokenValid } from '../services/Auth/authToken';
+import { isTokenValid } from "../services/Auth/authToken";
 
 export const SessionProvider = ({ children }) => {
     const [session, setSession] = useState(() => {
-        const storedSession = sessionStorage.getItem('session');
+        const storedSession = sessionStorage.getItem("session");
         return storedSession ? JSON.parse(storedSession) : null;
     });
 
     useEffect(() => {
         if (session) {
-            const { token, id }= session.user;
+            const { token, id } = session.user;
             if (isTokenValid(token, id)) {
-                sessionStorage.setItem('session', JSON.stringify(session));
+                sessionStorage.setItem("session", JSON.stringify(session));
             } else {
-                sessionStorage.removeItem('session');
+                sessionStorage.removeItem("session");
                 setSession(null);
             }
         } else {
-            sessionStorage.removeItem('session');
+            sessionStorage.removeItem("session");
         }
     }, [session]);
 
-    return (
-        <SessionContext.Provider value={{ session, setSession }}>
-            {children}
-        </SessionContext.Provider>
-    );
+    return <SessionContext.Provider value={{ session, setSession }}>{children}</SessionContext.Provider>;
 };
 SessionProvider.propTypes = {
-    children: PropTypes.node
-}
+    children: PropTypes.node,
+};
