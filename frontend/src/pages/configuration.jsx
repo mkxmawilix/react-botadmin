@@ -1,15 +1,14 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import CircularProgress from "@mui/material/CircularProgress";
 import { Box, Button } from "@mui/material";
-import { useActivePage } from "@toolpad/core/useActivePage";
+import CircularProgress from "@mui/material/CircularProgress";
 import { PageContainer } from "@toolpad/core/PageContainer";
-
-/**  Component **/
-import { ServerConfig } from "../components/ServerConfig/ServerConfig";
+import { useActivePage } from "@toolpad/core/useActivePage";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 /** API **/
 import { getGuild } from "../api/guilds/getGuild";
+/**  Component **/
+import { ServerConfig } from "../components/ServerConfig/ServerConfig";
 
 const ServerConfigurationPage = () => {
     const { serverId } = useParams();

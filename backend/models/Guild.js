@@ -1,31 +1,31 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const GuildSchema = new mongoose.Schema({
     id: {
         type: Number,
         required: true,
-        unique: true
+        unique: true,
     },
     name: {
         type: String,
-        required: true
+        required: true,
     },
     creationDate: {
         type: Date,
-        required: true
+        required: true,
     },
     shardId: {
         type: Number,
-        required: true
+        required: true,
     },
     addedAt: {
         type: Date,
-        default: Date.now
+        default: Date.now,
     },
     owner: {
         type: String,
-        required: true
-    }
+        required: true,
+    },
 });
 
-module.exports = mongoose.model('Guild', GuildSchema);
+module.exports = mongoose.model("Guild", GuildSchema);

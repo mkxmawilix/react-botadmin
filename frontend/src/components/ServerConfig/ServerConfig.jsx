@@ -1,16 +1,16 @@
-import { useState } from "react";
-import PropTypes from "prop-types";
 import {
     Box,
-    Tabs,
-    Tab,
+    Button,
     Dialog,
-    DialogTitle,
+    DialogActions,
     DialogContent,
     DialogContentText,
-    DialogActions,
-    Button,
+    DialogTitle,
+    Tab,
+    Tabs,
 } from "@mui/material";
+import PropTypes from "prop-types";
+import { useState } from "react";
 
 /** Components **/
 import DynamicConfigForm from "../DynamicConfigForm";
@@ -60,6 +60,66 @@ const ServerConfig = ({ guild }) => {
         });
     };
 
+    const buildFieldsList = (cogsSettings) => {
+        const { settings } = cogsSettings;
+        const fieldList = [];
+        if (Object.prototype.hasOwnProperty.call(settings, "active")) {
+            fieldList.push({
+                name: "activeCog",
+                label: "Active",
+                type: "checkbox",
+                defaultValue: "checked" in settings ? settings.checked : settings.active,
+                validation: {
+                    required: false,
+                },
+            });
+        }
+        if (Object.prototype.hasOwnProperty.call(settings, "blocked_channel_ids")) {
+            fieldList.push({
+                name: "blockedChannelIds",
+                label: "Blocked Channel IDs",
+                type: "array",
+                defaultValue: settings.blocked_channel_ids,
+                validation: {
+                    required: false,
+                },
+            });
+        }
+        if (cogsSettings.name === "Uwu") {
+            fieldList.push(
+                {
+                    name: "tenorApiKey",
+                    label: "Tenor API Key",
+                    type: "text",
+                    defaultValue: settings.tenor_apikey || "",
+                    validation: {
+                        required: true,
+                    },
+                },
+                {
+                    name: "tenorUrl",
+                    label: "Tenor URL",
+                    type: "text",
+                    defaultValue: settings.tenor_url || "",
+                    validation: {
+                        required: true,
+                    },
+                },
+                {
+                    name: "tenorLimit",
+                    label: "Tenor Limit",
+                    type: "integer",
+                    defaultValue: settings.tenor_limit || "",
+                    validation: {
+                        required: true,
+                    },
+                }
+            );
+        }
+
+        return fieldList;
+    };
+
     return (
         <Box sx={{ display: "flex", flexGrow: 1, bgcolor: "background.paper", height: "100%" }}>
             <Tabs
@@ -75,7 +135,7 @@ const ServerConfig = ({ guild }) => {
                 ))}
             </Tabs>
             {/* TODO map on transformed object usable by the form */}
-            {guild.cogsSettings.map((settings, index) => (
+            {guild.cogsSettings.map((cogSettings, index) => (
                 <Box
                     key={index}
                     role="tabpanel"
@@ -87,26 +147,7 @@ const ServerConfig = ({ guild }) => {
                     {activeTab === index && (
                         /* TODO Use new transformed object to send fields to the form */
                         <DynamicConfigForm
-                            fields={[
-                                {
-                                    name: "activeCog",
-                                    label: "Active",
-                                    type: "checkbox",
-                                    defaultValue: false,
-                                    validation: {
-                                        required: true,
-                                    },
-                                },
-                                {
-                                    name: "blockedChannelIds",
-                                    label: "Blocked Channel IDs",
-                                    type: "array",
-                                    defaultValue: ["123", "456"],
-                                    validation: {
-                                        required: true,
-                                    },
-                                },
-                            ]}
+                            fields={buildFieldsList(cogSettings)}
                             onSave={(data) => handleSave(index, data)}
                             onDirtyChange={(dirty) => handleDirtyChange(index, dirty)}
                         />
