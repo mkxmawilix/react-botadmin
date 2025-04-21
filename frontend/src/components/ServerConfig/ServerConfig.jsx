@@ -31,6 +31,13 @@ const ServerConfig = ({ guild }) => {
     };
 
     const confirmTabChange = () => {
+        // Reset the dirty state for the current tab when user confirms leaving without saving
+        setIsDirty((prev) => {
+            const newState = [...prev];
+            newState[activeTab] = false;
+            return newState;
+        });
+
         setShowDialog(false);
         setActiveTab(pendingTab);
         setPendingTab(null);
@@ -60,6 +67,211 @@ const ServerConfig = ({ guild }) => {
         });
     };
 
+    const buildFieldsListUwu = (settings) => {
+        const uwuFieldList = [];
+        uwuFieldList.push(
+            {
+                name: "tenorApiKey",
+                label: "Tenor API Key",
+                type: "text",
+                defaultValue: settings.tenor_apikey || "",
+                validation: {
+                    required: true,
+                },
+            },
+            {
+                name: "tenorUrl",
+                label: "Tenor URL",
+                type: "text",
+                defaultValue: settings.tenor_url || "",
+                validation: {
+                    required: true,
+                },
+            },
+            {
+                name: "tenorLimit",
+                label: "Tenor Limit",
+                type: "integer",
+                defaultValue: settings.tenor_limit || "",
+                validation: {
+                    required: true,
+                },
+            }
+        );
+        return uwuFieldList;
+    };
+
+    const buildFieldsListProjectDelivery = (settings) => {
+        const projectDeliveryFieldList = [];
+        projectDeliveryFieldList.push(
+            {
+                name: "projectDeliveryChannelId",
+                label: "Project Delivery Channel ID",
+                type: "text",
+                defaultValue: settings.channel_id || "",
+                validation: {
+                    required: true,
+                },
+            },
+            {
+                name: "gitlabUrl",
+                label: "Gitlab URL",
+                type: "text",
+                defaultValue: settings.url || "",
+                validation: {
+                    required: true,
+                },
+            },
+            {
+                name: "gitlabToken",
+                label: "Gitlab Token",
+                type: "text",
+                defaultValue: settings.token || "",
+                validation: {
+                    required: true,
+                },
+            },
+            {
+                name: "gitlabProjectIds",
+                label: "Gitlab Project IDs",
+                type: "array",
+                defaultValue: settings.project_ids || [],
+                validation: {
+                    required: true,
+                },
+            },
+            {
+                name: "Odoo",
+                label: "Odoo",
+                type: "object",
+                fields: [
+                    {
+                        name: "odooHost",
+                        label: "Hostname",
+                        type: "text",
+                        defaultValue: settings.odoo.hostname || "",
+                        validation: {
+                            required: true,
+                        },
+                    },
+                    {
+                        name: "odooDb",
+                        label: "Database",
+                        type: "text",
+                        defaultValue: settings.odoo.database || "",
+                        validation: {
+                            required: true,
+                        },
+                    },
+                    {
+                        name: "odooPort",
+                        label: "Port",
+                        type: "integer",
+                        defaultValue: settings.odoo.port || "",
+                        validation: {
+                            required: true,
+                        },
+                    },
+                    {
+                        name: "odooUsername",
+                        label: "Username",
+                        type: "text",
+                        defaultValue: settings.odoo.login || "",
+                        validation: {
+                            required: true,
+                        },
+                    },
+                    {
+                        name: "odooPassword",
+                        label: "New Password",
+                        type: "password",
+                        defaultValue: "",
+                        validation: {
+                            required: false,
+                        },
+                    },
+                    {
+                        name: "odooStages",
+                        label: "Stages",
+                        type: "tables",
+                        tables: [
+                            {
+                                name: "Testing",
+                                columns: [
+                                    {
+                                        name: "from_stage_id",
+                                        label: "From Id",
+                                        defaultValue: settings.stages.testing.from_stage_id || "",
+                                        validation: {
+                                            required: true,
+                                        },
+                                        type: "integer",
+                                    },
+                                    {
+                                        name: "to_stage_id",
+                                        label: "To Id",
+                                        defaultValue: settings.stages.testing.to_stage_id || "",
+                                        validation: {
+                                            required: true,
+                                        },
+                                        type: "integer",
+                                    },
+                                ],
+                            },
+                            {
+                                name: "Staging",
+                                columns: [
+                                    {
+                                        name: "from_stage_id",
+                                        label: "From Id",
+                                        defaultValue: settings.stages.staging.from_stage_id || "",
+                                        validation: {
+                                            required: true,
+                                        },
+                                        type: "integer",
+                                    },
+                                    {
+                                        name: "to_stage_id",
+                                        label: "To Id",
+                                        defaultValue: settings.stages.staging.to_stage_id || "",
+                                        validation: {
+                                            required: true,
+                                        },
+                                        type: "integer",
+                                    },
+                                ],
+                            },
+                            {
+                                name: "Production",
+                                columns: [
+                                    {
+                                        name: "from_stage_id",
+                                        label: "From Id",
+                                        defaultValue: settings.stages.prod.from_stage_id || "",
+                                        validation: {
+                                            required: true,
+                                        },
+                                        type: "integer",
+                                    },
+                                    {
+                                        name: "to_stage_id",
+                                        label: "To Id",
+                                        defaultValue: settings.stages.prod.to_stage_id || "",
+                                        validation: {
+                                            required: true,
+                                        },
+                                        type: "integer",
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            }
+        );
+        return projectDeliveryFieldList;
+    };
+
     const buildFieldsList = (cogsSettings) => {
         const { settings } = cogsSettings;
         const fieldList = [];
@@ -86,37 +298,11 @@ const ServerConfig = ({ guild }) => {
             });
         }
         if (cogsSettings.name === "Uwu") {
-            fieldList.push(
-                {
-                    name: "tenorApiKey",
-                    label: "Tenor API Key",
-                    type: "text",
-                    defaultValue: settings.tenor_apikey || "",
-                    validation: {
-                        required: true,
-                    },
-                },
-                {
-                    name: "tenorUrl",
-                    label: "Tenor URL",
-                    type: "text",
-                    defaultValue: settings.tenor_url || "",
-                    validation: {
-                        required: true,
-                    },
-                },
-                {
-                    name: "tenorLimit",
-                    label: "Tenor Limit",
-                    type: "integer",
-                    defaultValue: settings.tenor_limit || "",
-                    validation: {
-                        required: true,
-                    },
-                }
-            );
+            fieldList.push(...buildFieldsListUwu(settings));
         }
-
+        if (cogsSettings.name === "Project_delivery") {
+            fieldList.push(...buildFieldsListProjectDelivery(settings));
+        }
         return fieldList;
     };
 

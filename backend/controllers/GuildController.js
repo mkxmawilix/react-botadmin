@@ -6,37 +6,45 @@ const Cog = require("../models/Cog");
 
 exports.getGuilds = async (req, res) => {
     try {
-        const flaskResponse = await axios.get(`${process.env.FLASK_URL}/guilds`);
+        // Get guild data from MongoDB
+        const storedGuilds = await Guild.find({});
+        const userId = req.user.id;
 
-        if (flaskResponse.status === 200) {
-            const activeGuilds = flaskResponse.data.guilds;
-            const userId = req.user.id;
+        // Fetch permissions for the user
+        const permissions = await Permission.find({
+            userId,
+            role: "admin",
+        });
+        const allowedGuildIds = permissions.map((permission) => permission.guildId);
 
-            const permissions = await Permission.find({
-                userId,
-                role: "admin",
-            });
-            const allowedGuildIds = permissions.map((permission) => permission.guildId);
-
-            const storedGuilds = await Guild.find({});
-
-            const guildsWithStatus = storedGuilds.map((guild) => {
-                const isActive = activeGuilds.some((activeGuild) => Number(activeGuild.id) === guild.id);
-                return {
-                    id: guild.id,
-                    name: guild.name,
-                    creationDate: guild.creationDate,
-                    shardId: guild.shardId,
-                    owner: guild.owner,
-                    canConfigure: allowedGuildIds.includes(guild.id),
-                    isActive,
-                };
-            });
-
-            return res.status(200).json({ guilds: guildsWithStatus });
-        } else {
-            return res.status(flaskResponse.status).json({ message: "Failed to fetch guilds from the bot." });
+        // Check active guilds from the bot
+        const activeGuilds = [];
+        try {
+            const response = await axios.get(`${process.env.FLASK_URL}/guilds`);
+            if (response.status === 200 && Array.isArray(response.data.guilds)) {
+                response.data.guilds.forEach((guild) => {
+                    if (guild && guild.id) {
+                        activeGuilds.push({ id: Number(guild.id) });
+                    }
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching guilds from Flask API:", error);
         }
+        const guildsWithStatus = storedGuilds.map((guild) => {
+            const isActive = activeGuilds.some((activeGuild) => Number(activeGuild.id) === guild.id);
+            return {
+                id: guild.id,
+                name: guild.name,
+                creationDate: guild.creationDate,
+                shardId: guild.shardId,
+                owner: guild.owner,
+                canConfigure: allowedGuildIds.includes(guild.id),
+                isActive,
+            };
+        });
+
+        return res.status(200).json({ guilds: guildsWithStatus });
     } catch (error) {
         console.error("Error fetching guilds from Flask API:", error);
         return res.status(500).json({ message: "Internal server error." });
@@ -63,11 +71,20 @@ exports.getGuild = async (req, res) => {
             cogs.map(async (cog) => {
                 const collectionName = cog.collection_name;
                 const collection = await Cog.db.collection(collectionName).findOne({ guild_id: guildIdNumber });
+                // FIXME : Change type ?
                 // Transform MongoDB Long objects to strings if they exist in the collection
                 if (collection && collection.blocked_channel_ids && Array.isArray(collection.blocked_channel_ids)) {
                     collection.blocked_channel_ids = collection.blocked_channel_ids.map((id) =>
                         typeof id === "object" && id.constructor.name === "Long" ? id.toString() : id.toString()
                     );
+                }
+                if (
+                    collection &&
+                    collection.channel_id &&
+                    typeof collection.channel_id === "object" &&
+                    collection.channel_id.constructor.name === "Long"
+                ) {
+                    collection.channel_id = collection.channel_id.toString();
                 }
                 return {
                     name: cog.name,
