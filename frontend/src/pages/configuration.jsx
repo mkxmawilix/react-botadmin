@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Paper } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import { PageContainer } from "@toolpad/core/PageContainer";
 import { useActivePage } from "@toolpad/core/useActivePage";
@@ -56,9 +56,11 @@ const ServerConfigurationPage = () => {
     const path = `${activePage.path}/${serverId}`;
     const breadcrumbs = [...activePage.breadcrumbs, { title, path }];
     return (
-        <PageContainer maxWidth={false} title={`Configuration - ${guild.name}`} breadcrumbs={breadcrumbs}>
-            <ServerConfig guild={guild} />
-        </PageContainer>
+        <Paper sx={{ width: "100%" }}>
+            <PageContainer maxWidth={false} title={`Configuration - ${guild.name}`} breadcrumbs={breadcrumbs}>
+                <ServerConfig guild={guild} />
+            </PageContainer>
+        </Paper>
     );
 };
 

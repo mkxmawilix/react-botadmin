@@ -1,21 +1,18 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import App from "./App";
 
+import App from "./App";
+/** Components */
+import Register from "./components/Register";
+import { SessionProvider } from "./context/SessionProvider";
 /** Layouts */
 import AppDashboardLayout from "./layouts/Dashboard";
-
+import ServerConfigurationPage from "./pages/configuration";
 /** Pages */
 import DashboardPage from "./pages/index";
 import ServerListPage from "./pages/serverList";
-import ServerConfigurationPage from "./pages/configuration";
 import SignIn from "./pages/signIn";
-
-/** Components */
-import Register from "./components/Register";
-
-import { SessionProvider } from "./context/SessionProvider";
 
 const router = createBrowserRouter([
     {

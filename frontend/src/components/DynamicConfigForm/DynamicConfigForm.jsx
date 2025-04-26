@@ -70,6 +70,7 @@ const DynamicConfigForm = ({ fields, onSave, onDirtyChange }) => {
         watch,
     } = useForm({
         defaultValues: initialValues,
+        mode: "onBlur",
     });
 
     // Store initial values for comparison
@@ -138,19 +139,21 @@ const DynamicConfigForm = ({ fields, onSave, onDirtyChange }) => {
             ? `${field.name}.${tableIndex}.${column.name}`
             : `${field.name}.${tableIndex}.${column.name}`;
 
-        // Handle numeric inputs properly in tables
-        const registerOptions =
-            column.type === "integer"
-                ? {
-                      valueAsNumber: true,
-                      validate: (value) => {
-                          if (value < 0) {
-                              return "Value must be a positive number";
-                          }
-                          return true;
-                      },
-                  }
-                : {};
+        //
+        const registerOptions = {
+            ...(column.validation || {}),
+            ...(column.type === "integer" ? { valueAsNumber: true } : {}),
+        };
+
+        // Get the error path for this field
+        const path = fieldName.split(".");
+        let fieldError = errors;
+        for (const segment of path) {
+            fieldError = fieldError?.[segment];
+            if (!fieldError) {
+                break;
+            }
+        }
 
         return (
             <TextField
@@ -161,20 +164,45 @@ const DynamicConfigForm = ({ fields, onSave, onDirtyChange }) => {
                 {...register(fieldName, registerOptions)}
                 variant="outlined"
                 size="small"
-                error={!!errors[fieldName]}
-                helperText={errors[fieldName] ? errors[fieldName].message : ""}
+                error={!!fieldError}
+                helperText={fieldError?.message || ""}
             />
         );
     };
 
     // Render a specific field based on its type
     const renderField = (field) => {
+        // For nested fields, we need to check if the field name contains a dot to determine the correct error path
+        const isNestedField = field.name.includes(".");
+
+        // If the field is nested, we need to traverse the errors object to find the correct error message
+        let fieldError = null;
+        if (isNestedField) {
+            const path = field.name.split(".");
+            let current = errors;
+            for (const segment of path) {
+                if (!current || !current[segment]) {
+                    current = undefined;
+                    break;
+                }
+                current = current[segment];
+            }
+            fieldError = current;
+        } else {
+            fieldError = errors[field.name];
+        }
+
         switch (field.type) {
             case "checkbox":
                 return (
                     <FormControlLabel
                         key={field.name}
-                        control={<Checkbox {...register(field.name)} defaultChecked={field.defaultValue} />}
+                        control={
+                            <Checkbox
+                                {...register(field.name, field.validation || {})}
+                                defaultChecked={field.defaultValue}
+                            />
+                        }
                         label={field.label}
                     />
                 );
@@ -183,9 +211,11 @@ const DynamicConfigForm = ({ fields, onSave, onDirtyChange }) => {
                     <TextField
                         key={field.name}
                         label={field.label}
-                        {...register(field.name)}
+                        {...register(field.name, field.validation || {})}
                         variant="outlined"
                         size="small"
+                        error={!!fieldError}
+                        helperText={fieldError?.message || ""}
                     />
                 );
             case "integer":
@@ -195,26 +225,39 @@ const DynamicConfigForm = ({ fields, onSave, onDirtyChange }) => {
                         label={field.label}
                         type="number"
                         {...register(field.name, {
+                            ...(field.validation || {}),
                             valueAsNumber: true,
-                            validate: (value) => {
-                                if (value < 0) {
-                                    return "Value must be a positive number";
-                                }
-                                return true;
-                            },
                         })}
                         variant="outlined"
                         size="small"
-                        error={!!errors[field.name]}
-                        helperText={errors[field.name] ? errors[field.name].message : ""}
+                        error={!!fieldError}
+                        helperText={fieldError?.message || ""}
                     />
                 );
             case "array": {
                 const { fields: arrayFields, append, remove } = fieldArrays[field.name];
+
+                // Get the error for the array field
+                const arrayError = errors[field.name];
+
                 return (
                     <Box key={field.name} sx={{ mb: 2 }}>
-                        <Typography variant="subtitle1">{field.label}</Typography>
-                        <Paper variant="outlined" sx={{ p: 2, mb: 1 }}>
+                        <Typography variant="subtitle1" color={arrayError ? "error.main" : "inherit"}>
+                            {field.label}
+                            {arrayError && arrayError.message && (
+                                <Typography variant="caption" color="error.main" sx={{ ml: 1 }}>
+                                    ({arrayError.message})
+                                </Typography>
+                            )}
+                        </Typography>
+                        <Paper
+                            variant="outlined"
+                            sx={{
+                                p: 2,
+                                mb: 1,
+                                borderColor: arrayError ? "error.main" : undefined,
+                            }}
+                        >
                             <List dense>
                                 {arrayFields.map((item, index) => (
                                     <ListItem
@@ -227,15 +270,19 @@ const DynamicConfigForm = ({ fields, onSave, onDirtyChange }) => {
                                     >
                                         <TextField
                                             fullWidth
-                                            {...register(`${field.name}.${index}`)}
+                                            {...register(`${field.name}.${index}`, {
+                                                ...(field.itemValidation || {}),
+                                            })}
                                             size="small"
                                             variant="outlined"
+                                            error={!!errors[field.name]?.[index]}
+                                            helperText={errors[field.name]?.[index]?.message || ""}
                                         />
                                     </ListItem>
                                 ))}
                                 {arrayFields.length === 0 && (
                                     <ListItem>
-                                        <Typography variant="body2" color="textSecondary">
+                                        <Typography variant="body2" color={arrayError ? "error.main" : "textSecondary"}>
                                             No items added yet
                                         </Typography>
                                     </ListItem>
@@ -245,19 +292,39 @@ const DynamicConfigForm = ({ fields, onSave, onDirtyChange }) => {
                         <Box sx={{ display: "flex", gap: 1 }}>
                             <TextField
                                 size="small"
-                                label={`Add new ${field.label}`}
+                                label={
+                                    arrayFields.length < (field.validation?.maxLength?.value || Infinity)
+                                        ? `Add new ${field.label}`
+                                        : "Max items reached"
+                                }
                                 value={newItemValue}
                                 onChange={(e) => setNewItemValue(e.target.value)}
+                                disabled={arrayFields.length >= (field.validation?.maxLength?.value || Infinity)}
+                                error={!!errors[field.name]?.message}
                             />
                             <Button
                                 variant="contained"
                                 onClick={() => {
                                     if (newItemValue.trim()) {
+                                        // Check if maxLength is defined and if the current length exceeds it
+                                        const maxLength = field.validation?.maxLength;
+                                        if (maxLength && arrayFields.length >= maxLength.value) {
+                                            // Display a notification or handle the overflow case
+                                            console.warn(`Max length of ${maxLength.value} reached`);
+                                            return;
+                                        }
+
                                         append(newItemValue.trim());
                                         setNewItemValue("");
                                     }
                                 }}
                                 startIcon={<AddIcon />}
+                                // Disable the button if the input is empty or if maxLength is reached
+                                disabled={
+                                    !newItemValue.trim() ||
+                                    (field.validation?.maxLength &&
+                                        arrayFields.length >= field.validation.maxLength.value)
+                                }
                             >
                                 Add
                             </Button>
@@ -271,9 +338,11 @@ const DynamicConfigForm = ({ fields, onSave, onDirtyChange }) => {
                         key={field.name}
                         label={field.label}
                         type="password"
-                        {...register(field.name)}
+                        {...register(field.name, field.validation || {})}
                         variant="outlined"
                         size="small"
+                        error={!!errors[field.name]}
+                        helperText={errors[field.name]?.message || ""}
                     />
                 );
             case "object":
@@ -336,14 +405,22 @@ const DynamicConfigForm = ({ fields, onSave, onDirtyChange }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                {getFormFields()}
-                <Button type="submit" variant="contained" color="primary" disabled={!isDirtyForm}>
-                    Save
-                </Button>
-            </Box>
-        </form>
+        <Box
+            sx={{
+                width: "100%",
+                borderRadius: 1,
+                boxShadow: 3,
+            }}
+        >
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2, p: 2 }}>
+                    {getFormFields()}
+                    <Button type="submit" variant="contained" color="primary" disabled={!isDirtyForm}>
+                        Save
+                    </Button>
+                </Box>
+            </form>
+        </Box>
     );
 };
 

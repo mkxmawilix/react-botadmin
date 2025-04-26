@@ -272,6 +272,124 @@ const ServerConfig = ({ guild }) => {
         return projectDeliveryFieldList;
     };
 
+    const buildFieldsListGitlab = (settings) => {
+        const gitlabFieldList = [];
+        gitlabFieldList.push(
+            {
+                name: "gitlabUrl",
+                label: "Gitlab URL",
+                type: "text",
+                defaultValue: settings.url || "",
+                validation: {
+                    required: true,
+                },
+            },
+            {
+                name: "gitlabToken",
+                label: "Gitlab Token",
+                type: "text",
+                defaultValue: settings.token || "",
+                validation: {
+                    required: true,
+                },
+            },
+            {
+                name: "gitlabChannelId",
+                label: "Gitlab Channel ID",
+                type: "text",
+                defaultValue: settings.channel_id || "",
+                validation: {
+                    required: true,
+                },
+            },
+            {
+                name: "labelToValidate",
+                label: "Label to validate",
+                type: "text",
+                defaultValue: settings.label_to_validate || "",
+                validation: {
+                    required: true,
+                },
+            },
+            {
+                name: "labelValidated",
+                label: "Label validated",
+                type: "text",
+                defaultValue: settings.label_validated || "",
+                validation: {
+                    required: true,
+                },
+            },
+            {
+                name: "NumberReactionsNeeded",
+                label: "Number of reactions needed",
+                type: "object",
+                fields: [
+                    {
+                        name: "nbrForApproval",
+                        label: "# Approval",
+                        type: "integer",
+                        defaultValue: settings.nbr_reactions_required.approval || 0,
+                        validation: {
+                            required: "This field is required",
+                            min: { value: 1, message: "The value must be at least 1" },
+                        },
+                    },
+                    {
+                        name: "nbrForValidation",
+                        label: "# Validation",
+                        type: "integer",
+                        defaultValue: settings.nbr_reactions_required.validation || 0,
+                        validation: {
+                            required: "This field is required",
+                            min: { value: 1, message: "The value must be at least 1" },
+                        },
+                    },
+                ],
+            },
+            {
+                name: "gitlabToken",
+                label: "Gitlab Token",
+                type: "text",
+                defaultValue: settings.token || "",
+                validation: {
+                    required: true,
+                },
+            },
+            {
+                name: "gitlabUrl",
+                label: "Gitlab URL",
+                type: "text",
+                defaultValue: settings.url || "",
+                validation: {
+                    required: true,
+                },
+            },
+            {
+                name: "gitlabProjectIds",
+                label: "Gitlab Project IDs",
+                type: "array",
+                defaultValue: settings.project_ids || [],
+                validation: {
+                    required: "At least one project is required",
+                    maxLength: { value: 1, message: "Only one project is allowed for now" },
+                    validate: {
+                        notEmpty: (value) => value.length > 0 || "At least one project is required",
+                        maxLength: (value) => value.length <= 1 || "Only one project is allowed for now",
+                    },
+                },
+                // Validation for each item in the array
+                itemValidation: {
+                    pattern: {
+                        value: /^\d+$/,
+                        message: "The project ID must be a number",
+                    },
+                },
+            }
+        );
+        return gitlabFieldList;
+    };
+
     const buildFieldsList = (cogsSettings) => {
         const { settings } = cogsSettings;
         const fieldList = [];
@@ -302,6 +420,9 @@ const ServerConfig = ({ guild }) => {
         }
         if (cogsSettings.name === "Project_delivery") {
             fieldList.push(...buildFieldsListProjectDelivery(settings));
+        }
+        if (cogsSettings.name === "Gitlab") {
+            fieldList.push(...buildFieldsListGitlab(settings));
         }
         return fieldList;
     };
